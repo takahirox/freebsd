@@ -1609,7 +1609,9 @@ fdgrowtable(struct filedesc *fdp, int nfd)
 	 * static allocation contained within (struct filedesc0 *)fdp,
 	 * which must not be freed.
 	 */
-	if (onfiles > NDFILE) {
+	if (fdp->fd_refcnt == 1) {
+		free(otable, M_FILEDESC);
+	} else if (onfiles > NDFILE) {
 		ft = (struct freetable *)&otable->fdt_ofiles[onfiles];
 		fdp0 = (struct filedesc0 *)fdp;
 		ft->ft_table = otable;
